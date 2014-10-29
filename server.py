@@ -15,6 +15,23 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
     Echo server class
     """
     diccio = {}
+    
+
+    def register2file(self):
+        """
+        Manipulacion de fichero
+        """  
+        dic = self.diccio
+        fichero = open("registered.txt", "w")
+        fichero.write('User' + '\t' + 'IP' + '\t' + 'Expires' + '\n')
+        for Usuario, Valor in dic.items():
+            hora = Valor.split(',')[-1]  # me quedo con lo que esta despues de,
+            ip = Valor.split(',')[0]
+            # me devuelve un strig de texpires+hactual
+            tactual = time.strftime('%Y-%m-%d %H:%M:%S',
+                                    time.gmtime(float(hora)))
+            #voy escribiendo en el fichero la inf de los usuarios
+            fichero.write(Usuario + '\t' + ip + '\t' + tactual + '\n')
 
     def handle(self):
         hactual = time.time()
@@ -55,24 +72,6 @@ class SIPRegisterHandler(SocketServer.DatagramRequestHandler):
             if hactual > float(Texp):  # si se caduca borro el usuario
                 del self.diccio[Usuario]
                 self.register2file()
-
-        """
-        Manipulacion de fichero
-        """
-
-    def register2file(self):
-        dic = self.diccio
-        fichero = open("registered.txt", "w")
-        fichero.write('User' + '\t' + 'IP' + '\t' + 'Expires' + '\n')
-        for Usuario, Valor in dic.items():
-            hora = Valor.split(',')[-1]  # me quedo con lo que esta despues de,
-            ip = Valor.split(',')[0]
-            # me devuelve un strig de texpires+hactual
-            tactual = time.strftime('%Y-%m-%d %H:%M:%S',
-                                    time.gmtime(float(hora)))
-            #voy escribiendo en el fichero la inf de los usuarios
-            fichero.write(Usuario + '\t' + ip + '\t' + tactual + '\n')
-
 
 if __name__ == "__main__":
     # Creamos servidor de eco y escuchamos
